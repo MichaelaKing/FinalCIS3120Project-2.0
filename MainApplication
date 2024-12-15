@@ -1,0 +1,36 @@
+# MainApplication.py - Integrates all classes
+class MainApplication:
+    def __init__(self, client_id, client_secret, redirect_uri):
+        self.auth = SpotifyAuth(client_id, client_secret, redirect_uri)
+        self.spotify_client = self.auth.get_spotify_client()
+        self.data_fetcher = SpotifyDataFetcher(self.spotify_client)
+
+    def run(self, user_favorite_genres):
+        # Fetch top artists
+        artist_data = self.data_fetcher.get_top_artists()
+        
+        # Analyze music taste
+        analyzer = MusicTasteAnalyzer(artist_data)
+        genre_counts = analyzer.analyze_genres()
+        matching_genres = analyzer.compare_with_user_taste(user_favorite_genres)
+
+        # Display results
+        print("Top Genres:")
+        for genre, count in genre_counts.most_common(10):
+            print(genre, "-", count)
+
+        print("\
+Matching Genres with User's Taste:")
+        print(matching_genres)
+
+# Example usage
+CLIENT_ID = 'your_client_id'
+CLIENT_SECRET = 'your_client_secret'
+REDIRECT_URI = 'http://localhost:8888/callback'
+
+# User's favorite genres
+user_favorite_genres = ['rock', 'pop', 'jazz']
+
+# Run the application
+app = MainApplication(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
+app.run(user_favorite_genres)
