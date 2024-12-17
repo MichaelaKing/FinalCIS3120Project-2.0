@@ -1,40 +1,45 @@
-# main.py
-from config import SpotifyConfig
-from SpotifyAuth import SpotifyAuth
-from SpotifyDataFetcher import SpotifyDataFetcher
-from MusicTasteAnalyzer import MusicTasteAnalyzer
+# Running the provided Spotify authentication code to verify and troubleshoot
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
+import pandas as pd
 
-class MainApplication:
-    def __init__(self):
-        self.auth = SpotifyAuth(SpotifyConfig.CLIENT_ID, SpotifyConfig.CLIENT_SECRET, SpotifyConfig.REDIRECT_URI)
-        self.spotify_client = self.auth.get_spotify_client()
-        self.data_fetcher = SpotifyDataFetcher(self.spotify_client)
+# Define the credentials and scope
+CLIENT_ID = '8810837ef20d4cb7a5fdf4260e366409'
+CLIENT_SECRET = '13e560bd868245e9b6dc58328837b2aa'
+REDIRECT_URI = 'http://localhost:8888/callback'  # This will still work even with 404
+scope = 'user-top-read user-read-private playlist-read-private user-library-read'
 
-    def run(self, user_favorite_genres):
-        # Fetch top artists
-        artist_data = self.data_fetcher.get_top_artists()
-        
-        # Analyze music taste
-        analyzer = MusicTasteAnalyzer(artist_data)
-        genre_counts = analyzer.analyze_genres()
-        matching_genres = analyzer.compare_with_user_taste(user_favorite_genres)
-
-        # Display results
-        print("Top Genres:")
-        for genre, count in genre_counts.most_common(10):
-            print(genre, "-", count)
-
-        print("\
-Matching Genres with User's Taste:")
-        print(matching_genres)
-
-# Example usage
-if __name__ == "__main__":
-    # User's favorite genres
-    user_favorite_genres = ['rock', 'pop', 'jazz']
-
-    # Run the application
-    app = MainApplication()
-    app.run(user_favorite_genres)
-
-print("Main application script created successfully")
+try:
+    # Initialize SpotifyOAuth with cache handling
+    auth_manager = SpotifyOAuth(
+        client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET,
+        redirect_uri=REDIRECT_URI,
+        scope=scope,
+        open_browser=False,  # Prevent automatic browser opening
+        cache_path='.spotify_cache'  # Save the token cache to a file
+    )
+    
+    print("After you authorize in the browser, copy the entire URL you were redirected to (including the 'code' parameter)")
+    auth_url = auth_manager.get_authorize_url()
+    print("Please visit this URL to authorize the application:")
+    print(auth_url)
+    
+    # Get the URL that the user was redirected to
+    redirect_url = input('Paste the URL you were redirected to: ')
+    
+    # Get the token using the redirect URL
+    code = auth_manager.parse_response_code(redirect_url)
+    token_info = auth_manager.get_access_token(code)
+    
+    # Create Spotify client
+    sp = spotipy.Spotify(auth_manager=auth_manager)
+    
+    # Test the connection
+    current_user = sp.current_user()
+    print("Successfully connected to Spotify!")
+    print(f"Logged in as: {current_user['display_name']}")
+    
+except Exception as e:
+    print("Error during authentication:", str(e))
+    print("Error type:", type(e).__name__)
