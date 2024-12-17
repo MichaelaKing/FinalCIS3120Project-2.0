@@ -1,4 +1,6 @@
-# MusicTasteAnalyzer.py - Analyzes user music taste
+from collections import Counter
+
+
 class MusicTasteAnalyzer:
     def __init__(self, artist_data):
         self.artist_data = artist_data
@@ -6,18 +8,10 @@ class MusicTasteAnalyzer:
     def analyze_genres(self):
         # Flatten the genres into a single list
         all_genres = [genre for artist in self.artist_data for genre in artist['genres']]
-        
-        # Count the frequency of each genre
-        from collections import Counter
         genre_counts = Counter(all_genres)
         return genre_counts
 
     def compare_with_user_taste(self, user_favorite_genres):
-        # Analyze genres
         genre_counts = self.analyze_genres()
-        
-        # Check overlap with user's favorite genres
         matching_genres = [genre for genre in user_favorite_genres if genre in genre_counts]
         return matching_genres
-
-print("MusicTasteAnalyzer class created successfully")

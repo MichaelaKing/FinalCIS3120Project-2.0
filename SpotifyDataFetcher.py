@@ -1,4 +1,6 @@
-# SpotifyDataFetcher.py - Fetches user data
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
+
 class SpotifyDataFetcher:
     def __init__(self, spotify_client):
         self.spotify_client = spotify_client
@@ -16,5 +18,3 @@ class SpotifyDataFetcher:
         except Exception as e:
             print(f"Error fetching top artists: {str(e)}")
             return []
-
-print("SpotifyDataFetcher class created successfully")
