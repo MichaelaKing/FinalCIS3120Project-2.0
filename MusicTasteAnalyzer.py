@@ -1,6 +1,5 @@
 from collections import Counter
 
-
 class MusicTasteAnalyzer:
     def __init__(self, artist_data):
         self.artist_data = artist_data

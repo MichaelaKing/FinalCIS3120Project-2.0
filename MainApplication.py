@@ -31,7 +31,7 @@ if __name__ == "__main__":
         spotify_client = spotipy.Spotify(auth_manager=auth_manager)
         print("Successfully connected to Spotify!")
 
-        # Fetch Top Artists using SpotifyDataFetcher class
+        #Fetch Top Artists using SpotifyDataFetcher class
         print("\nFetching top artists...")
         data_fetcher = SpotifyDataFetcher(spotify_client)
         artist_data = data_fetcher.get_top_artists(limit=10)
@@ -39,12 +39,12 @@ if __name__ == "__main__":
         if not artist_data:
             print("No artist data found.")
         else:
-            # Display top artists
+            #Display top artists
             print("\nTop Artists:")
             for idx, artist in enumerate(artist_data):
                 print(f"{idx+1}. {artist['name']} - Genres: {', '.join(artist['genres'])}")
 
-            # Analyze Genres using MusicTasteAnalyzer class
+            #Analyze Genres using MusicTasteAnalyzer class
             print("\nAnalyzing genres...")
             analyzer = MusicTasteAnalyzer(artist_data)
             genre_analysis = analyzer.analyze_genres()
@@ -52,13 +52,6 @@ if __name__ == "__main__":
             print("\nGenre Analysis (Top 5):")
             for genre, count in genre_analysis.most_common(5):
                 print(f"{genre}: {count} occurrences")
-
-            # Compare genres with user's favorite genres
-            user_favorites = ["pop", "rock", "indie"]
-            matching_genres = analyzer.compare_with_user_taste(user_favorites)
-
-            print("\nMatching Genres with User's Favorites:")
-            print(matching_genres if matching_genres else "No matching genres found.")
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")

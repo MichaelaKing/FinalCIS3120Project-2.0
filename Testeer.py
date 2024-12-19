@@ -23,7 +23,7 @@ app = Flask(__name__)
 @app.route("/")
 def display_spotify_data():
     try:
-        # Authenticate with Spotify
+        #Authenticatintion with Spotify
         auth_manager = SpotifyOAuth(
             client_id=CLIENT_ID,
             client_secret=CLIENT_SECRET,
@@ -34,37 +34,102 @@ def display_spotify_data():
         )
         spotify_client = spotipy.Spotify(auth_manager=auth_manager)
 
-        # Fetch Top Artists
+        #Fetch Top Artists
         data_fetcher = SpotifyDataFetcher(spotify_client)
         artist_data = data_fetcher.get_top_artists(limit=10)
 
-        # Analyze Genres
+        #Analyze Genres
         analyzer = MusicTasteAnalyzer(artist_data)
         genre_analysis = analyzer.analyze_genres()
 
-        # HTML Template for Display
+        #HTML Template for Display
         html_template = """
         <html>
-        <head><title>Spotify Top Artists</title></head>
-        <body>
-            <h1>Spotify Top Artists</h1>
-            {% if artist_data %}
-                <h2>Top Artists</h2>
-                <ul>
-                {% for artist in artist_data %}
-                    <li>{{ loop.index }}. {{ artist['name'] }} - Genres: {{ ", ".join(artist['genres']) }}</li>
-                {% endfor %}
-                </ul>
-                <h2>Genre Analysis</h2>
-                <ul>
-                {% for genre, count in genre_analysis.items() %}
-                    <li>{{ genre }}: {{ count }} occurrences</li>
-                {% endfor %}
-                </ul>
-            {% else %}
-                <p>No artist data found. Try listening to some music on Spotify!</p>
-            {% endif %}
-        </body>
+            <head>
+                <title>Spotify Top Artists</title>
+                <style>
+                    body {
+                        font-family:Veranda, serif;
+                        max-width: 800px;
+                        margin: 40px auto;
+                        padding: 20px;
+                        line-height: 1.6;
+                        background-color: black;
+                        color: white;
+                    }
+
+                    .title {
+                        font-family:Veranda, serif;
+                        text-align: center;
+                        font-size: 36px;
+                        font-weight: bold;
+                        margin-bottom: 30px;
+                        text-transform: uppercase;
+                        letter-spacing: 2px;
+                        border-bottom: 2px solid white;
+                        padding-bottom: 20px;
+                    }
+
+                    h2 {
+                        font-family:Veranda, serif;
+                        font-size: 24px;
+                        margin-top: 40px;
+                        margin-bottom: 20px;
+                        text-transform: uppercase;
+                        letter-spacing: 1px;
+                    }
+
+                    ul {
+                        font-family:Veranda, serif;
+                        list-style-type: none;
+                        padding: 0;
+                    }
+
+                    li {
+                        font-family:Veranda, serif;
+                        margin-bottom: 10px;
+                        font-size: 18px;
+                    }
+
+                    .error {
+                        color: red;
+                        font-weight: bold;
+                        text-align: center;
+                        margin-top: 20px;
+                    }
+
+                    .footer {
+                        font-family:Veranda, serif;
+                        text-align: center;
+                        margin-top: 50px;
+                        font-size: 14px;
+                        color: gray;
+                    }
+                </style>
+            </head>
+            <body>
+                <h1 class=title>Spotify Top Artists</h1>
+
+                {% if artist_data %}
+                    <h2 class=h2>Top Artists</h2>
+                    <ul>
+                        {% for artist in artist_data %}
+                            <li>{{ loop.index }}. {{ artist['name'] }} - Genres: {{ ", ".join(artist['genres']) }}</li>
+                        {% endfor %}
+                    </ul>
+
+                    <h2>Genre Analysis</h2>
+                    <ul>
+                        {% for genre, count in genre_analysis.items() %}
+                            <li>{{ genre }}: {{ count }} occurrences</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="error">No artist data found. Try listening to some music on Spotify!</p>
+                {% endif %}
+
+                
+            </body>
         </html>
         """
 
