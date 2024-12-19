@@ -1,1 +1,19 @@
 # FinalCIS3120Project-2.0
+Purpose and Functionality
+
+This project aims to provide a personalized analysis of a Spotify user's music preferences. By leveraging the Spotify API, the application retrieves the user's top artists and genres from recently, analyzes the data, and creates visualizations to represent the information effectively. Users can view:
+
+Top Artists by Play Count (Bar Chart)
+
+Genre Distribution (Pie Chart)
+
+The project is designed to offer insights into a user's listening habits and genre preferences, presented in an interactive web interface. (I wanted to try and make this since spotify didnt do genres this year)
+
+To install the program you will have to clone the url https://github.com/MichaelaKing/FinalCIS3120Project-2.0 and install certain libraries in the terminal
+
+pip install spotipy
+pip install Flask
+
+
+The API credentials I used were creation of an application in Spotify Developer and using the CLIENT_ID and CLIENT_SECRET
+I added http://localhost:8888/callback as a Redirect URI in the Spotify app settings.

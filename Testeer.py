@@ -1,29 +1,26 @@
 import os
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-from flask import Flask, render_template_string
+from flask import Flask, render_template_string, url_for
 import webbrowser
 import threading
 from SpotifyDataFetcher import SpotifyDataFetcher
 from MusicTasteAnalyzer import MusicTasteAnalyzer
+from SpotifyDataVisualizer import SpotifyDataVisualizer
 
-# Spotify User Credentials and Scope
 CLIENT_ID = '8810837ef20d4cb7a5fdf4260e366409'
 CLIENT_SECRET = '13e560bd868245e9b6dc58328837b2aa'
 REDIRECT_URI = 'http://localhost:8888/callback'
 SCOPE = 'user-top-read user-read-private'
 
-
 if os.path.exists(".cache"):
     os.remove(".cache")
 
-# Flask App Setup
 app = Flask(__name__)
 
 @app.route("/")
 def display_spotify_data():
     try:
-        #Authenticatintion with Spotify
         auth_manager = SpotifyOAuth(
             client_id=CLIENT_ID,
             client_secret=CLIENT_SECRET,
@@ -34,22 +31,23 @@ def display_spotify_data():
         )
         spotify_client = spotipy.Spotify(auth_manager=auth_manager)
 
-        #Fetch Top Artists
         data_fetcher = SpotifyDataFetcher(spotify_client)
         artist_data = data_fetcher.get_top_artists(limit=10)
 
-        #Analyze Genres
         analyzer = MusicTasteAnalyzer(artist_data)
         genre_analysis = analyzer.analyze_genres()
 
-        #HTML Template for Display
+        visualizer = SpotifyDataVisualizer()
+        visualizer.visualize_genre_distribution_pie(genre_analysis, save_path="static/genre_distribution_pie.png")
+        visualizer.visualize_artist_play_counts(artist_data, save_path="static/artist_play_counts.png")
+
         html_template = """
         <html>
             <head>
                 <title>Spotify Top Artists</title>
                 <style>
                     body {
-                        font-family:Veranda, serif;
+                        font-family: Arial, sans-serif;
                         max-width: 800px;
                         margin: 40px auto;
                         padding: 20px;
@@ -59,7 +57,6 @@ def display_spotify_data():
                     }
 
                     .title {
-                        font-family:Veranda, serif;
                         text-align: center;
                         font-size: 36px;
                         font-weight: bold;
@@ -71,7 +68,6 @@ def display_spotify_data():
                     }
 
                     h2 {
-                        font-family:Veranda, serif;
                         font-size: 24px;
                         margin-top: 40px;
                         margin-bottom: 20px;
@@ -80,15 +76,18 @@ def display_spotify_data():
                     }
 
                     ul {
-                        font-family:Veranda, serif;
                         list-style-type: none;
                         padding: 0;
                     }
 
                     li {
-                        font-family:Veranda, serif;
                         margin-bottom: 10px;
                         font-size: 18px;
+                    }
+
+                    .charts {
+                        text-align: center;
+                        margin-top: 20px;
                     }
 
                     .error {
@@ -97,23 +96,14 @@ def display_spotify_data():
                         text-align: center;
                         margin-top: 20px;
                     }
-
-                    .footer {
-                        font-family:Veranda, serif;
-                        text-align: center;
-                        margin-top: 50px;
-                        font-size: 14px;
-                        color: gray;
-                    }
                 </style>
             </head>
             <body>
                 <img src="{{ url_for('static', filename='Full_Logo_Green_RGB.svg') }}" alt="Spotify Logo" style="display: block; margin: 0 auto; width: 200px;">
-
-                <h1 class=title>Spotify Top Artists</h1>
+                <h1 class="title">Spotify Top Artists</h1>
 
                 {% if artist_data %}
-                    <h2 class=h2>Top Artists</h2>
+                    <h2>Top Artists</h2>
                     <ul>
                         {% for artist in artist_data %}
                             <li>{{ loop.index }}. {{ artist['name'] }} - Genres: {{ ", ".join(artist['genres']) }}</li>
@@ -121,16 +111,13 @@ def display_spotify_data():
                     </ul>
 
                     <h2>Genre Analysis</h2>
-                    <ul>
-                        {% for genre, count in genre_analysis.items() %}
-                            <li>{{ genre }}: {{ count }} occurrences</li>
-                        {% endfor %}
-                    </ul>
+                    <div class="charts">
+                        <img src="{{ url_for('static', filename='genre_distribution_pie.png') }}" alt="Genre Distribution" style="width: 100%; max-width: 500px; margin-bottom: 20px;">
+                        <img src="{{ url_for('static', filename='artist_play_counts.png') }}" alt="Artist Play Counts" style="width: 100%; max-width: 500px;">
+                    </div>
                 {% else %}
                     <p class="error">No artist data found. Try listening to some music on Spotify!</p>
                 {% endif %}
-
-                
             </body>
         </html>
         """
@@ -141,14 +128,8 @@ def display_spotify_data():
         return f"<h1>Error</h1><p>{str(e)}</p>"
 
 def open_browser():
-    """
-    Automatically opens the browser to the Flask app after Spotify OAuth.
-    """
     webbrowser.open_new("http://127.0.0.1:5000/")
 
 if __name__ == "__main__":
-    # Open browser in a separate thread
     threading.Timer(1, open_browser).start()
-
-    # Start the Flask server
     app.run(debug=False)

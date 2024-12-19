@@ -1,5 +1,4 @@
 import spotipy
-from spotipy.oauth2 import SpotifyOAuth
 
 class SpotifyDataFetcher:
     def __init__(self, spotify_client):
@@ -12,7 +11,8 @@ class SpotifyDataFetcher:
             for artist in top_artists['items']:
                 artist_data.append({
                     'name': artist['name'],
-                    'genres': artist['genres']
+                    'genres': artist['genres'],
+                    'play_count': artist.get('popularity', 0)  # Simulated play count using popularity
                 })
             return artist_data
         except Exception as e:
