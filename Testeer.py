@@ -13,7 +13,7 @@ CLIENT_SECRET = '13e560bd868245e9b6dc58328837b2aa'
 REDIRECT_URI = 'http://localhost:8888/callback'
 SCOPE = 'user-top-read user-read-private'
 
-# Clear cached token
+
 if os.path.exists(".cache"):
     os.remove(".cache")
 
@@ -108,6 +108,8 @@ def display_spotify_data():
                 </style>
             </head>
             <body>
+                <img src="{{ url_for('static', filename='Full_Logo_Green_RGB.svg') }}" alt="Spotify Logo" style="display: block; margin: 0 auto; width: 200px;">
+
                 <h1 class=title>Spotify Top Artists</h1>
 
                 {% if artist_data %}
@@ -133,7 +135,6 @@ def display_spotify_data():
         </html>
         """
 
-        # Render the HTML Template
         return render_template_string(html_template, artist_data=artist_data, genre_analysis=genre_analysis)
 
     except Exception as e:
