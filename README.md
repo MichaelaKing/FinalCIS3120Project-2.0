@@ -21,8 +21,8 @@ I added http://localhost:8888/callback as a Redirect URI in the Spotify app sett
 Update Credentials in the MainApplication
 Replace the following variables in the MainApplication.py file:
 
-CLIENT_ID = '8810837ef20d4cb7a5fdf4260e366409'
-CLIENT_SECRET = '13e560bd868245e9b6dc58328837b2aa'
+CLIENT_ID = ''
+CLIENT_SECRET = ''
 REDIRECT_URI = 'http://localhost:8888/callback'
 
 1. Create a static directory to make sure the charts are sent there
