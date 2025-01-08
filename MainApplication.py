@@ -5,8 +5,8 @@ from SpotifyDataFetcher import SpotifyDataFetcher
 from MusicTasteAnalyzer import MusicTasteAnalyzer
 from SpotifyDataVisualizer import SpotifyDataVisualizer 
 
-CLIENT_ID = '8810837ef20d4cb7a5fdf4260e366409'
-CLIENT_SECRET = '13e560bd868245e9b6dc58328837b2aa'
+CLIENT_ID = ''
+CLIENT_SECRET = ''
 REDIRECT_URI = 'http://localhost:8888/callback'
 SCOPE = 'user-top-read user-read-private'
 
